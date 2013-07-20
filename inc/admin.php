@@ -21,7 +21,12 @@ class PITO_Simple_Visitor_Counter_Admin {
 	}
 
 	public function validate_opts( $input ) {
+		$new_input = array();
 
+		$new_input['delete'] = ( 1 == $input ) ? true : false;
+		$new_input['ignore'] = ( 0 == $input['ignore'] || 1 == $input['ignore'] || 2 == $input['ignore'] ) ? intval( $input['ignore'] ) : 0;
+
+		return $new_input;
 	}
 
 	public function options_page() {
@@ -30,7 +35,8 @@ class PITO_Simple_Visitor_Counter_Admin {
 		}
 
 		$defaults = array(
-			'delete' => false
+			'delete' => false,
+			'ignore' => 0
 		);
 
 		extract( wp_parse_args( get_option( 'pito_svc_options', array() ), $defaults ) );
@@ -45,6 +51,30 @@ class PITO_Simple_Visitor_Counter_Admin {
 
 				<table class="form-table">
 					<tbody>
+						<tr valign="top">
+							<th scope="row"><?php esc_html_e( 'Count Hits From', 'pito_svc' ); ?>:</th>
+							<td>
+								<fieldset>
+									<legend class="screen-reader-text">
+										<span>Count Hits From</span>
+									</legend>
+									<label title="Everybody">
+										<input name="pito_svc_options[ignore]" type="radio" value="0" <?php checked( $ignore, 0 ); ?> />
+										<span>Everybody</span>
+									</label>
+									<br />
+									<label title="Non-administrators">
+										<input name="pito_svc_options[ignore]" type="radio" value="1" <?php checked( $ignore, 1 ); ?> />
+										<span>Non-administrators</span>
+									</label>
+									<br />
+									<label title="Non-logged-in Users">
+										<input name="pito_svc_options[ignore]" type="radio" value="2" <?php checked( $ignore, 2 ); ?> />
+										<span>Non-logged-in Users</span>
+									</label>
+								</fieldset>
+							</td>
+						</tr>
 						<tr valign="top">
 							<th scope="row"><?php esc_html_e( 'Plugin Deletion', 'pito_svc' ); ?>:</th>
 							<td>

@@ -19,7 +19,11 @@ class PITO_Simple_Visitor_Counter {
 
 		wp_enqueue_script( 'pito_svs_ajax', plugins_url( 'scripts/ajax.js', PITO_SVS_ABSPATH ), array( 'jquery' ), false, true );
 
-		$args = array( 'ajax_url' => admin_url('admin-ajax.php') );
+		$args = array( 
+			'ajax_url' => admin_url('admin-ajax.php'),
+			'admin' => current_user_can( 'manage_options' ),
+			'logged_in' => is_user_logged_in()
+		);
 
 		if ( is_singular() ) {
 			$args['current_page'] = $wp_query->post->ID;
@@ -39,30 +43,63 @@ class PITO_Simple_Visitor_Counter {
 			die();
 		}
 
+		$response = array();
+
+		$default_options = array(
+			'ignore' => 0,
+			'delete' => false
+		);
+
+		$options = wp_parse_args( get_option( 'pito_svc_options', array() ), $default_options );
+
+		if ( ( $options['ignore'] == 1 && $_POST['admin'] == 1 ) || ( $options['ignore'] == 2 && $_POST['logged_in'] == 1 ) ) {
+			$response['success'] = false;
+
+			wp_send_json( $response );
+
+			die();
+		}
+
 		$now = current_time( 'mysql' );
 		$now_date = date_parse( $now );
 
 		$defaults = array(
 			'count' => 0,
-			'last_hit' => $now,
-			'count_today' => 0
+			'count_unique' => 0,
+			'count_today' => 0,
+			'count_unique_today' => 0,
+			'last_hit' => $now
 		);
 
 		$old_stats = get_option( 'pito_svc_stats', array() );
 		$stats = wp_parse_args( $old_stats, $defaults );
 
 		$stats['count']++;
+
+		if ( ! isset( $_COOKIE['pito_visitor_counter'] ) ) {
+			$stats['count_unique']++;
+		}
+
 		$last_date = date_parse( $stats['last_hit'] );
+		$last_date_unique = ( isset( $_COOKIE['pito_visitor_counter'] ) ) ? date_parse( $_COOKIE['pito_visitor_counter'] ) : false;
 
 		if ( $now_date['day'] != $last_date['day'] ) {
 			$stats['count_today'] = 1;
+			$stats['count_unique_today'] = 1;
 		} else {
 			$stats['count_today']++;
+			if ( ! empty( $last_date_unique ) && ( $now_date['day'] != $last_date_unique['day'] ) ) {
+				$stats['count_unique_today']++;
+			}
 		}
 
 		$stats['last_hit'] = $now;
 
+		setcookie( 'pito_visitor_counter', $now );
+
 		update_option( 'pito_svc_stats', $stats );
+
+		$response['stats'] = $stats;
 
 		if ( ! empty( $_POST['current_page'] ) && ctype_digit( $_POST['current_page'] ) ) {
 			$id = intval( $_POST['current_page'] );
@@ -82,7 +119,13 @@ class PITO_Simple_Visitor_Counter {
 			$single_stats['last_hit'] = $now;
 
 			update_post_meta( $id, '_pito_svc', $single_stats );
+
+			$response['single_stats'] = $single_stats;
 		}
+
+		$response['success'] = true;
+
+		wp_send_json( $response );
 
 		die();
 	}

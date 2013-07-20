@@ -15,14 +15,15 @@ if ( realpath( __FILE__ ) === realpath( $_SERVER["SCRIPT_FILENAME"] ) ) {
 }
 
 define( 'PITO_SVS_ABSPATH', __FILE__ );
+define( 'PITO_SVS_DIRPATH', plugin_dir_path( PITO_SVS_ABSPATH ) );
 
-require plugin_dir_path( __FILE__ ) . 'inc/main.php';
-require plugin_dir_path( __FILE__ ) . 'inc/widgets.php';
+require PITO_SVS_DIRPATH . 'inc/main.php';
+require PITO_SVS_DIRPATH . 'inc/widgets.php';
 global $pito_svc_instance;
 $pito_svc_instance = new PITO_Simple_Visitor_Counter();
 
 if ( is_admin() ) {
-	require plugin_dir_path( __FILE__ ) . 'inc/admin.php';
+	require PITO_SVS_DIRPATH . 'inc/admin.php';
 	global $pito_svc_admin_instance;
 	$pito_svc_admin_instance = new PITO_Simple_Visitor_Counter_Admin();
 }
