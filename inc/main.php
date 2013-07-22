@@ -65,9 +65,9 @@ class PITO_Simple_Visitor_Counter {
 
 		$defaults = array(
 			'count' => 0,
-			'count_unique' => 0,
+			'count_unique' => 1,
 			'count_today' => 0,
-			'count_unique_today' => 0,
+			'count_unique_today' => 1,
 			'last_hit' => $now
 		);
 

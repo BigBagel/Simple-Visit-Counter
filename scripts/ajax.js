@@ -13,7 +13,7 @@ jQuery(document).ready(function($) {
             $( '.pito_svc_widget span.svc_number.count' ).html( response.stats.count );
             $( '.pito_svc_widget span.svc_number.count_unique' ).html( response.stats.count_unique );
             $( '.pito_svc_widget span.svc_number.count_today' ).html( response.stats.count_today );
-            $( '.pito_svc_widget span.svc_number.count_today_unique' ).html( response.stats.count_today_unique );
+            $( '.pito_svc_widget span.svc_number.count_unique_today' ).html( response.stats.count_unique_today );
 
             if ( typeof response.single_stats != "undefined" ) {
                 $( '.pito_svc_widget span.svc_number.single_count' ).html( response.single_stats.count );

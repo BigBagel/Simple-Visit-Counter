@@ -7,9 +7,9 @@ if ( realpath( __FILE__ ) === realpath( $_SERVER["SCRIPT_FILENAME"] ) ) {
 
 class PITO_SVC_Widget extends WP_Widget {
 	public function __construct() {
-		$widget_ops = array( 'classname'=>'pito_svc_widget', 'description'=>'Display a hit counter.' );
+		$widget_ops = array( 'classname'=>'pito_svc_widget', 'description'=>'Display a visitor counter.' );
 
-		parent::__construct( 'pito_svc_widget', $name = 'PITO Hit Counter', $widget_ops );
+		parent::__construct( 'pito_svc_widget', $name = 'Simple Visitor Counter', $widget_ops );
 	}
 
 	/* widget output */
@@ -21,7 +21,8 @@ class PITO_SVC_Widget extends WP_Widget {
 			'title' => 'Hit Counter',
 			'total' => true,
 			'single' => true,
-			'today' => true
+			'today' => true,
+			'list' => false
 		);
 			
 		$instance = wp_parse_args( $instance, $instance_defaults );
@@ -30,6 +31,7 @@ class PITO_SVC_Widget extends WP_Widget {
 		$total = $instance['total'];
 		$single = $instance['single'];
 		$today = $instance['today'];
+		$list = $instance['list'];
 
 		$defaults = array(
 			'count' => 0,
@@ -46,41 +48,48 @@ class PITO_SVC_Widget extends WP_Widget {
 			echo $before_title . $title . $after_title;
 		}
 		
+		echo ( $list ) ? '<ul>' : '<p>';
+
 		if( $total ) {
-			echo '<p>';
+			echo ( $list ) ? '<li>' : '';
 			esc_html_e( 'Total hits: ', 'pito_svc' );
 			echo '<span class="svc_number count">' . $stats['count'] . '</span>';
-			echo '<br />';
+			echo ( $list ) ? '</li><li>' : '<br />';
 			esc_html_e( 'Total visitors: ', 'pito_svc' );
 			echo '<span class="svc_number count_unique">' . $stats['count_unique'] . '</span>';
+			echo ( $list ) ? '</li>' : '';
 		}
 
 		if ( $today ) {
-			echo '<br />';
+			echo ( $total && ! $list ) ? '<br />' : '';
+			echo ( $list ) ? '<li>' : '';
 			esc_html_e( "Today's hits: ", 'pito_svc' );
 			echo '<span class="svc_number count_today">' . $stats['count_today'] . '</span>';
-			echo '<br />';
+			echo ( $list ) ? '</li><li>' : '<br />';
 			esc_html_e( "Today's visitors: ", 'pito_svc' );
 			echo '<span class="svc_number count_unique_today">' . $stats['count_unique_today'] . '</span>';
+			echo ( $list ) ? '</li>' : '';
 		}
 
 		if ( $single && is_singular() ) {
 			$single_stats = wp_parse_args( get_post_meta( $wp_query->post->ID, '_pito_svc', true ), $defaults );
 
 			if ( $total ) {
-				echo '<br />';
+				echo ( $list ) ? '<li>' : '<br />';
 				esc_html_e( 'Total page hits: ', 'pito_svc' );
 				echo '<span class="svc_number single_count">' . $single_stats['count'] . '</span>';
+				echo ( $list ) ? '</li>' : '';
 			}
 
 			if ( $today ) {
-				echo '<br />';
+				echo ( $list ) ? '<li>' : '<br />';
 				esc_html_e( "Today's page hits: ", 'pito_svc' );
 				echo '<span class="svc_number single_count_today">' . $single_stats['count_today'] . '</span>';
+				echo ( $list ) ? '</li>' : '';
 			}
 		}
 
-		echo '</p>';
+		echo ( $list ) ? '</ul>' : '</p>';
 			
 		echo $after_widget;
 	}
@@ -93,6 +102,7 @@ class PITO_SVC_Widget extends WP_Widget {
 		$instance['total'] = ( isset( $new_instance['total'] ) ) ? true : false;
 		$instance['single'] = ( isset( $new_instance['single'] ) ) ? true : false;
 		$instance['today'] = ( isset( $new_instance['today'] ) ) ? true : false;
+		$instance['list'] = ( isset( $new_instance['list'] ) ) ? true : false;
 		
 		return $instance;
 	}
@@ -102,7 +112,8 @@ class PITO_SVC_Widget extends WP_Widget {
 			'title' => '', 
 			'total' => true,
 			'single' => true, 
-			'today' => true 
+			'today' => true,
+			'list' => false
 		);
 
 		$instance = extract( wp_parse_args( (array) $instance, $defaults ) );
@@ -125,6 +136,11 @@ class PITO_SVC_Widget extends WP_Widget {
 		<p>
 			<input id="<?php echo $this->get_field_id( 'single' ); ?>" class="checkbox" name="<?php echo $this->get_field_name( 'single' ); ?>" type="checkbox" value="1" <?php checked( $single ); ?> />
 			<label for="<?php echo $this->get_field_id( 'single' ); ?>"><?php esc_html_e( 'Show count for individual pages and posts?', 'pito_svc' ); ?></label>
+		</p>
+
+		<p>
+			<input id="<?php echo $this->get_field_id( 'list' ); ?>" class="checkbox" name="<?php echo $this->get_field_name( 'list' ); ?>" type="checkbox" value="1" <?php checked( $list ); ?> />
+			<label for="<?php echo $this->get_field_id( 'list' ); ?>"><?php esc_html_e( 'Display as unordered list?', 'pito_svc' ); ?></label>
 		</p>
 
 		<?php

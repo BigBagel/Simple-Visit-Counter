@@ -41,6 +41,12 @@ class PITO_Simple_Visitor_Counter_Admin {
 
 		extract( wp_parse_args( get_option( 'pito_svc_options', array() ), $defaults ) );
 
+		if ( ! empty( $_POST ) && check_admin_referer( 'delete_stats', 'delete_stats_field' ) ) {
+			delete_option( 'pito_svc_stats' );
+			delete_post_meta_by_key( '_pito_svc' );
+			echo '<div class="updated"><p>Stats deleted</p></div>';
+		}
+
 		?>
 		<div class="wrap">
 			<?php screen_icon(); ?>
@@ -84,7 +90,7 @@ class PITO_Simple_Visitor_Counter_Admin {
 									</legend>
 									<label for="pito_svc_options[delete]">
 										<input name="pito_svc_options[delete]" id="pito_svc_options[delete]" type="checkbox" value="1" <?php checked( $delete ); ?> />
-										Delete visitor stats on plugin deleltion
+										Delete visitor stats on plugin deletion
 									</label>
 								</fieldset>
 							</td>
@@ -93,9 +99,19 @@ class PITO_Simple_Visitor_Counter_Admin {
 				</table>
 
 				<p class="submit">
-					<input name="Submit" type="submit" id="submit" class="button-primary" value="<?php esc_attr_e( 'Save', 'pito_svc'); ?>" />
+					<input name="submit" type="submit" id="submit" class="button-primary" value="<?php esc_attr_e( 'Save', 'pito_svc'); ?>" />
 				</p>
+
 			</form>
+
+			<?php if ( isset( $_GET['allow_delete_stats'] ) ) { ?>
+				<form method="post">
+					<p class="submit">
+						<?php wp_nonce_field( 'delete_stats','delete_stats_field' ); ?>
+						<input name="submit" type="submit" id="delete" class="button-secondary" value="<?php esc_attr_e( 'Delete Stats', 'pito_svc'); ?>" />
+					</p>
+				</form>
+			<?php } ?>
 		</div>
 		<?php
 	}

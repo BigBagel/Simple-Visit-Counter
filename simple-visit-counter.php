@@ -2,8 +2,8 @@
 /*
 Plugin Name: Simple Visit Counter
 Plugin URI: http://pito.tamu.edu/
-Description: Displays visitor count with widget .
-Version: 0.0.1
+Description: Adds a visitor counter widget.
+Version: 1.0.0
 Author: Eric Bakenhus
 Author URI: http://pito.tamu.edu/
 */
