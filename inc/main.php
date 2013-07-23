@@ -95,7 +95,10 @@ class PITO_Simple_Visitor_Counter {
 
 		$stats['last_hit'] = $now;
 
-		setcookie( 'pito_visitor_counter', $now );
+		// Hopefully the 2038 bug will be solved by 2037 :p
+		$expires = ( time() > 2147483647 - ( 60 * 60 * 24 * 365 ) ) ? time() + ( 60 * 60 * 24 * 365 * 100 ) : 2147483647;
+
+		setcookie( 'pito_visitor_counter', $now, $expires );
 
 		update_option( 'pito_svc_stats', $stats );
 
