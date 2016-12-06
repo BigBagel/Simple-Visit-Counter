@@ -1,11 +1,10 @@
 <?php
 /*
 Plugin Name: Simple Visit Counter
-Plugin URI: http://pito.tamu.edu/
+Plugin URI: https://github.com/BigBagel/Simple-Visit-Counter
 Description: Adds a visitor counter widget.
 Version: 1.0.0
 Author: Eric Bakenhus
-Author URI: http://pito.tamu.edu/
 */
 
 if ( realpath( __FILE__ ) === realpath( $_SERVER["SCRIPT_FILENAME"] ) ) {
